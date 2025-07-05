@@ -1,0 +1,79 @@
+import { useState } from 'react';
+
+const WINNING_COMBINATIONS = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
+
+export default function TicTacToe() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [xIsNext, setXIsNext] = useState(true);
+
+  const winner = calculateWinner(squares);
+  const isDraw = !winner && squares.every(Boolean);
+
+  function handleClick(index) {
+    if (squares[index] || winner) return;
+
+    const newSquares = [...squares];
+    newSquares[index] = xIsNext ? 'X' : 'O';
+    setSquares(newSquares);
+    setXIsNext(!xIsNext);
+  }
+
+  function restartGame() {
+    setSquares(Array(9).fill(null));
+    setXIsNext(true);
+  }
+
+  function renderSquare(index) {
+    return (
+      <button
+        onClick={() => handleClick(index)}
+        className="w-20 h-20 text-2xl font-bold border border-gray-400"
+      >
+        {squares[index]}
+      </button>
+    );
+  }
+
+  let status;
+  if (winner) {
+    status = `Winner: ${winner}`;
+  } else if (isDraw) {
+    status = "It's a draw!";
+  } else {
+    status = `Next player: ${xIsNext ? 'X' : 'O'}`;
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <h1 className="text-3xl font-bold">Tic Tac Toe</h1>
+      <div className="grid grid-cols-3 gap-1">
+        {squares.map((_, i) => renderSquare(i))}
+      </div>
+      <div className="text-xl font-medium mt-4">{status}</div>
+      <button
+        onClick={restartGame}
+        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Restart Game
+      </button>
+    </div>
+  );
+}
+
+function calculateWinner(squares) {
+  for (let [a, b, c] of WINNING_COMBINATIONS) {
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
